@@ -9,7 +9,7 @@
  *
  * Fork Me @ https://github.com/manifestinteractive/jqvmap
  */
-(function ($) {
+(function ( $ ) {
 
   var apiParams = {
     colors: 1,
@@ -52,7 +52,7 @@
       borderOpacity: 0.25,
       selectedRegions: null,
       multiSelectRegion: false
-    }, map = this.data('mapObject');
+    }, map = ( this.length ) ? this.data('mapObject') : {};
 
     if (options === 'addMap') {
       WorldMap.maps[arguments[1]] = arguments[2];
@@ -380,7 +380,7 @@
 
     this.resize();
 
-    jQuery(window).resize(function () {
+    $(window).resize(function () {
       map.width = params.container.width();
       map.height = params.container.height();
       map.resize();
@@ -396,11 +396,11 @@
     this.rootGroup = this.canvas.createGroup(true);
 
     this.index = WorldMap.mapIndex;
-    this.label = jQuery('<div/>').addClass('jqvmap-label').appendTo(jQuery('body')).hide();
+    this.label = $('<div/>').addClass('jqvmap-label').appendTo($('body')).hide();
 
     if (params.enableZoom) {
-      jQuery('<div/>').addClass('jqvmap-zoomin').text('+').appendTo(params.container);
-      jQuery('<div/>').addClass('jqvmap-zoomout').html('&#x2212;').appendTo(params.container);
+      $('<div/>').addClass('jqvmap-zoomin').text('+').appendTo(params.container);
+      $('<div/>').addClass('jqvmap-zoomout').html('&#x2212;').appendTo(params.container);
     }
 
     map.countries = [];
@@ -417,26 +417,26 @@
       if (this.canvas.mode == 'svg') {
         path.setAttribute('class', 'jvectormap-region');
       } else {
-        jQuery(path).addClass('jvectormap-region');
+        $(path).addClass('jvectormap-region');
       }
 
-      jQuery(this.rootGroup).append(path);
+      $(this.rootGroup).append(path);
     }
 
-    jQuery(params.container).delegate(this.canvas.mode == 'svg' ? 'path' : 'shape', 'mouseover mouseout', function (e) {
+    $(params.container).delegate(this.canvas.mode == 'svg' ? 'path' : 'shape', 'mouseover mouseout', function (e) {
       var path = e.target,
       code = e.target.id.split('_').pop(),
       labelShowEvent = $.Event('labelShow.jqvmap'),
       regionMouseOverEvent = $.Event('regionMouseOver.jqvmap');
 
       if (e.type == 'mouseover') {
-        jQuery(params.container).trigger(regionMouseOverEvent, [code, mapData.pathes[code].name]);
+        $(params.container).trigger(regionMouseOverEvent, [code, mapData.pathes[code].name]);
         if (!regionMouseOverEvent.isDefaultPrevented()) {
           map.highlight(code, path);
         }
         if (params.showTooltip) {
           map.label.text(mapData.pathes[code].name);
-          jQuery(params.container).trigger(labelShowEvent, [map.label, code]);
+          $(params.container).trigger(labelShowEvent, [map.label, code]);
 
           if (!labelShowEvent.isDefaultPrevented()) {
             map.label.show();
@@ -448,11 +448,11 @@
         map.unhighlight(code, path);
 
         map.label.hide();
-        jQuery(params.container).trigger('regionMouseOut.jqvmap', [code, mapData.pathes[code].name]);
+        $(params.container).trigger('regionMouseOut.jqvmap', [code, mapData.pathes[code].name]);
       }
     });
 
-    jQuery(params.container).delegate(this.canvas.mode == 'svg' ? 'path' : 'shape', 'click', function (e) {
+    $(params.container).delegate(this.canvas.mode == 'svg' ? 'path' : 'shape', 'click', function (e) {
       if (!params.multiSelectRegion) {
         for (var key in mapData.pathes) {
           map.countries[key].currentFillColor = map.countries[key].getOriginalFill();
@@ -463,22 +463,15 @@
       var path = e.target;
       var code = e.target.id.split('_').pop();
 
-      jQuery(params.container).trigger('regionClick.jqvmap', [code, mapData.pathes[code].name]);
-      if (!regionClickEvent.isDefaultPrevented()) {
-        if (map.selectedRegions.indexOf(code) !== -1) {
-          map.deselect(code, path);
-        } else {
-          map.select(code, path);
-        }
-      }
-
-      //console.log(selectedRegions);
+      $(params.container).trigger('regionClick.jqvmap', [code, mapData.pathes[code].name]);
+      path.currentFillColor = params.selectedColor;
+      path.setFill(params.selectedColor);
 
     });
 
     if (params.showTooltip) {
       params.container.mousemove(function (e) {
-        if (map.label.is(':visible')) {
+        if (map.label.isVisible( )) {
             var left = e.pageX - 15 - map.labelWidth;
             var top = e.pageY - 15 - map.labelHeight;
             
@@ -794,7 +787,7 @@
     
     zoomIn: function () {
       var map = this;
-      var sliderDelta = (jQuery('#zoom').innerHeight() - 6 * 2 - 15 * 2 - 3 * 2 - 7 - 6) / (this.zoomMaxStep - this.zoomCurStep);
+      var sliderDelta = ($('#zoom').innerHeight() - 6 * 2 - 15 * 2 - 3 * 2 - 7 - 6) / (this.zoomMaxStep - this.zoomCurStep);
 
       if (map.zoomCurStep < map.zoomMaxStep) {
         var curTransX = map.transX;
@@ -806,7 +799,7 @@
         map.setScale(map.scale * map.zoomStep);
         map.zoomCurStep++;
 
-        jQuery('#zoomSlider').css('top', parseInt(jQuery('#zoomSlider').css('top'), 10) - sliderDelta);
+        $('#zoomSlider').css('top', parseInt($('#zoomSlider').css('top'), 10) - sliderDelta);
         
         map.container.trigger("zoomIn");
       }
@@ -814,7 +807,7 @@
     
     zoomOut: function () {
       var map = this;
-      var sliderDelta = (jQuery('#zoom').innerHeight() - 6 * 2 - 15 * 2 - 3 * 2 - 7 - 6) / (this.zoomMaxStep - this.zoomCurStep);
+      var sliderDelta = ($('#zoom').innerHeight() - 6 * 2 - 15 * 2 - 3 * 2 - 7 - 6) / (this.zoomMaxStep - this.zoomCurStep);
 
       if (map.zoomCurStep > 1) {
         var curTransX = map.transX;
@@ -826,7 +819,7 @@
         map.setScale(map.scale / map.zoomStep);
         map.zoomCurStep--;
 
-        jQuery('#zoomSlider').css('top', parseInt(jQuery('#zoomSlider').css('top'), 10) + sliderDelta);
+        $('#zoomSlider').css('top', parseInt($('#zoomSlider').css('top'), 10) + sliderDelta);
         
         map.container.trigger("zoomOut");
       }
@@ -853,28 +846,28 @@
       }
 
       if(pinMode == "content") {//treat pin as content
-        jQuery.each(pins, function(index, pin){
-          if(jQuery('#'+map.getCountryId(index)).length == 0){
+        $.each(pins, function(index, pin){
+          if($('#'+map.getCountryId(index)).length == 0){
               return;
           }
           //mapData.pathes[code].name
           var pinIndex = map.getPinId(index);
-          if(jQuery('#'+pinIndex).length > 0){
-            jQuery('#'+pinIndex).remove();
+          if($('#'+pinIndex).length > 0){
+            $('#'+pinIndex).remove();
           }
           map.container.append('<div id="' + pinIndex + '" for="'+index+'" class="jqvmap_pin" style="position:absolute">' + pin + '</div>');
         });
       } else { //treat pin as id of an html content
-        jQuery.each(pins, function(index, pin){
-          if(jQuery('#'+map.getCountryId(index)).length == 0){
+        $.each(pins, function(index, pin){
+          if($('#'+map.getCountryId(index)).length == 0){
               return;
           }
           var pinIndex = map.getPinId(index);
-          if(jQuery('#'+pinIndex).length > 0){
-            jQuery('#'+pinIndex).remove();
+          if($('#'+pinIndex).length > 0){
+            $('#'+pinIndex).remove();
           }
           map.container.append('<div id="' + pinIndex + '" for="'+index+'" class="jqvmap_pin" style="position:absolute"></div>');
-          jQuery('#'+pinIndex).append(jQuery('#'+pin));
+          $('#'+pinIndex).append($('#'+pin));
         });
       }
 
@@ -893,10 +886,10 @@
     positionPins: function(){
       var map = this;
       var pins = this.container.find('.jqvmap_pin');
-      jQuery.each(pins, function(index, pinObj){
-        pinObj = jQuery(pinObj);
+      $.each(pins, function(index, pinObj){
+        pinObj = $(pinObj);
         var countryId = map.getCountryId(pinObj.attr('for'));
-        var countryObj = jQuery('#' + countryId);
+        var countryObj = $('#' + countryId);
 
         var bbox = document.getElementById(countryId).getBBox();
         var position = countryObj.position();
@@ -911,15 +904,15 @@
      },
 
      getPin: function(cc){
-       var pinObj = jQuery('#'+this.getPinId(cc));
+       var pinObj = $('#'+this.getPinId(cc));
        return pinObj.html();
      },
 
      getPins: function(){
        var pins = this.container.find('.jqvmap_pin');
        var ret = new Object();
-       jQuery.each(pins, function(index, pinObj){
-         pinObj = jQuery(pinObj);
+       $.each(pins, function(index, pinObj){
+         pinObj = $(pinObj);
          var cc = pinObj.attr('for');
          var pinContent = pinObj.html();
          eval("ret." + cc + "=pinContent");
@@ -928,7 +921,7 @@
      },
 
      removePin: function(cc) {
-       jQuery('#'+this.getPinId(cc)).remove();
+       $('#'+this.getPinId(cc)).remove();
      },
 
      removePins: function(){
@@ -1097,4 +1090,4 @@
     return [parseInt(rgb.substr(0, 2), 16), parseInt(rgb.substr(2, 2), 16), parseInt(rgb.substr(4, 2), 16)];
   };
 
-})(jQuery);
+})( 'Zepto' in window ? Zepto : jQuery );
