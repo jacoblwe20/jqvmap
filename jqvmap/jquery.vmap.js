@@ -1090,4 +1090,4 @@
     return [parseInt(rgb.substr(0, 2), 16), parseInt(rgb.substr(2, 2), 16), parseInt(rgb.substr(4, 2), 16)];
   };
 
-})( 'Zepto' in window ? Zepto : jQuery );
+})( window.Zepto || window.jQuery );
